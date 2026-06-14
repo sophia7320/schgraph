@@ -1,8 +1,6 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
-use std::vec;
-
 #[derive(Debug, Default)]
 pub struct Graph {
     cnt: usize,
@@ -153,7 +151,7 @@ impl Graph {
             self.tsp_cost = Some(best_cost);
             let mut path = Graph::find_tsp_path_to_last(tsp_prev, best_last);
             path = self.tsp_to_realpath(path);
-            path.append(&mut self.find_path(best_last, 0)[1..].into());
+            path.extend(self.find_path(best_last, 0).drain(1..));
             self.tsp_path = path;
         } else {
             self.tsp_cost = None;
@@ -182,7 +180,7 @@ impl Graph {
         let mut res = vec![];
         res.push(tsp_path[0]);
         for i in 0..(tsp_path.len() - 1) {
-            res.append(&mut self.find_path(tsp_path[i], tsp_path[i + 1])[1..].into());
+            res.extend(self.find_path(tsp_path[i], tsp_path[i + 1]).drain(1..));
         }
         res
     }

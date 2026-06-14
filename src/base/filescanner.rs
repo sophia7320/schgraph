@@ -1,6 +1,9 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
-use std::fs;
+use core::panic;
+use std::{fs, str::FromStr};
+
+use crate::base::app::Place;
 
 #[derive(Debug)]
 pub struct FileScanner {
@@ -59,12 +62,58 @@ impl<'a> ScannerIter<'a> {
         if chunk.is_empty() { None } else { Some(chunk) }
     }
 
-    fn next_chunk3(&mut self) -> Option<Vec<&'a str>> {
-        self.next_chunk(3)
+    fn next_chunk_edge(&mut self) -> Option<(String, String, u64)> {
+        self.next_chunk(3).map(|x| match x.as_slice() {
+            [a, b, c] => (
+                String::from_str(a).unwrap(),
+                String::from_str(b).unwrap(),
+                c.parse::<u64>().unwrap(),
+            ),
+
+            _ => panic!("invalid chunk size"),
+        })
     }
 
-    fn getGraph() {
-        todo!()
+    fn next_desc(&mut self) -> Option<(String, String)> {
+        self.next_chunk(2).map(|x| match x.as_slice() {
+            [a, b] => (String::from_str(a).unwrap(), String::from_str(b).unwrap()),
+
+            _ => panic!("invalid chunk size"),
+        })
+    }
+
+    pub(super) fn get_places(&mut self) -> Vec<Place> {
+        let n = self
+            .next()
+            .unwrap()
+            .parse()
+            .expect("unable to parse the amount of places");
+
+        let mut res = Vec::with_capacity(n);
+
+        for idx in 0..n {
+            let (id, (name, desc)) = (idx, self.next_desc().unwrap());
+
+            res.push(Place::new(id, name, desc));
+        }
+
+        res
+    }
+
+    pub(super) fn get_raw_edges(&mut self) -> Vec<(String, String, u64)> {
+        let n: usize = self
+            .next()
+            .unwrap()
+            .parse()
+            .expect("unable to parse the amount of edge");
+
+        let mut res = Vec::with_capacity(n);
+
+        for _ in 0..n {
+            res.push(self.next_chunk_edge().unwrap());
+        }
+
+        res
     }
 }
 
