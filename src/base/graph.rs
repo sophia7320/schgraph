@@ -126,6 +126,18 @@ impl Graph {
                 }
             }
         }
+
+        let mut best_last: usize = 0;
+        let mut best_cost = u64::MAX;
+        let full_mask = max_mask - 1;
+        for node in 0..self.cnt {
+            let candidate = dp[full_mask][node] + self.shortest[node][0];
+
+            if candidate < best_cost {
+                best_last = node;
+                best_cost = candidate;
+            }
+        }
     }
 
     pub fn tsp_path(&self) -> &Vec<usize> {
