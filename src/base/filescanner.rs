@@ -46,7 +46,7 @@ impl<'a> Iterator for ScannerIter<'a> {
 
 impl<'a> ScannerIter<'a> {
     //todo impl next_chunk
-    pub fn next_chunk(&mut self, n: usize) -> Option<Vec<&'a str>> {
+    fn next_chunk(&mut self, n: usize) -> Option<Vec<&'a str>> {
         let mut chunk = Vec::with_capacity(n);
         for _ in 0..n {
             if let Some(val) = self.next() {
@@ -57,6 +57,14 @@ impl<'a> ScannerIter<'a> {
         }
 
         if chunk.is_empty() { None } else { Some(chunk) }
+    }
+
+    fn next_chunk3(&mut self) -> Option<Vec<&'a str>> {
+        self.next_chunk(3)
+    }
+
+    fn getGraph() {
+        todo!()
     }
 }
 
