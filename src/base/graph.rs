@@ -1,7 +1,7 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
 
-use std::u64::{self, MAX};
+use std::vec;
 
 #[derive(Debug, Default)]
 pub struct Graph {
@@ -87,6 +87,10 @@ impl Graph {
 
         let mut p = dst;
 
+        if self.pre[src][dst] == self.cnt {
+            return res;
+        }
+
         loop {
             res.push(p);
 
@@ -104,21 +108,25 @@ impl Graph {
         let cnt = self.cnt;
         let max_mask: usize = 1 << cnt;
 
-        let mut dp = vec![vec![u64::MAX; cnt]; max_mask];
+        let mut dp = vec![vec![u64::MAX / 2; cnt]; max_mask];
+        let mut tsp_prev = vec![vec![cnt; cnt]; max_mask];
+
+        dp[1][0] = 0;
 
         for mask in 0..max_mask {
-            if (mask & 1) == 1 {
-                for p in 1..self.cnt {
-                    if mask & (1 << p) == 1 {
-                        let mut temp = u64::MAX;
+            if (mask & 1) != 0 {
+                for p in 0..self.cnt {
+                    if mask & (1 << p) != 0 {
+                        let mut temp = u64::MAX / 2;
                         let t_mask = mask ^ (1 << p);
 
                         for k in 0..self.cnt {
-                            if t_mask & (1 << k) == 1 {
+                            if t_mask & (1 << k) != 0 {
                                 let candidate = dp[t_mask][k] + self.shortest[k][p];
                                 if candidate < temp {
                                     temp = candidate;
                                     dp[mask][p] = candidate;
+                                    tsp_prev[mask][p] = k;
                                 }
                             }
                         }
@@ -128,8 +136,10 @@ impl Graph {
         }
 
         let mut best_last: usize = 0;
-        let mut best_cost = u64::MAX;
+        let mut best_cost = u64::MAX / 2;
         let full_mask = max_mask - 1;
+
+        #[allow(clippy::needless_range_loop)]
         for node in 0..self.cnt {
             let candidate = dp[full_mask][node] + self.shortest[node][0];
 
@@ -138,6 +148,43 @@ impl Graph {
                 best_cost = candidate;
             }
         }
+
+        if best_cost != u64::MAX / 2 {
+            self.tsp_cost = Some(best_cost);
+            let mut path = Graph::find_tsp_path_to_last(tsp_prev, best_last);
+            path = self.tsp_to_realpath(path);
+            path.append(&mut self.find_path(best_last, 0)[1..].into());
+            self.tsp_path = path;
+        } else {
+            self.tsp_cost = None;
+            self.tsp_path = vec![];
+        }
+    }
+
+    fn find_tsp_path_to_last(prev: Vec<Vec<usize>>, last: usize) -> Vec<usize> {
+        let n = prev[0].len();
+        let mut res = vec![];
+
+        let mut p = last;
+        let mut mask: usize = (1 << n) - 1;
+        res.push(p);
+
+        while p != 0 {
+            (p, mask) = (prev[mask][p], mask ^ (1 << p));
+            res.push(p);
+        }
+
+        res.reverse();
+        res
+    }
+
+    fn tsp_to_realpath(&self, tsp_path: Vec<usize>) -> Vec<usize> {
+        let mut res = vec![];
+        res.push(tsp_path[0]);
+        for i in 0..(tsp_path.len() - 1) {
+            res.append(&mut self.find_path(tsp_path[i], tsp_path[i + 1])[1..].into());
+        }
+        res
     }
 
     pub fn tsp_path(&self) -> &Vec<usize> {
@@ -172,7 +219,7 @@ mod test {
         let es = vec![(0, 1, 5), (0, 3, 10), (1, 2, 3), (2, 3, 1), (1, 3, 6)];
         let gra = Graph::new(4, es);
 
-        assert_eq!(gra.tsp_path, vec![0, 1, 2, 3, 0]);
-        assert_eq!(gra.tsp_cost, Some(19));
+        assert_eq!(gra.tsp_path, vec![0, 1, 2, 3, 2, 1, 0]);
+        assert_eq!(gra.tsp_cost, Some(18));
     }
 }
