@@ -3,7 +3,7 @@
 use std::{collections::HashMap, io};
 
 use color_eyre::eyre::Result;
-use ratatui::{Terminal, prelude::CrosstermBackend};
+use ratatui::{Terminal, prelude::CrosstermBackend, widgets::ListState};
 
 use crate::base::{
     events::{Event, EventHandler},
@@ -17,6 +17,8 @@ use crate::base::{
 #[derive(Debug, Default)]
 pub struct App {
     should_exit: bool,
+    pub(super) main_menu_statu: ListState,
+
     pub(super) view: View,
 
     pub(super) places: Vec<Place>,
@@ -43,6 +45,8 @@ impl App {
 
     pub fn from_file(filepath: &str) -> Result<Self> {
         let mut app = App::new();
+        app.view = View::MainMenu;
+
         let scanner = FileScanner::from_file_path(filepath);
         let mut input = scanner.iter();
 
@@ -74,7 +78,7 @@ impl App {
         tui.enter()?;
 
         while !self.should_exit {
-            tui.draw(&self)?;
+            tui.draw(&mut self)?;
 
             let action = match tui.events.next()? {
                 Event::Tick => Action::Noop,
@@ -85,8 +89,29 @@ impl App {
             self.update(action);
         }
 
+        tui.exit()?;
+
         Ok(())
     }
 
-    fn update(&mut self, action: Action) {}
+    fn update(&mut self, action: Action) {
+        match action {
+            Action::Quit => self.should_exit = true,
+            Action::MenuDown => self.main_menu_statu.select_next(),
+            Action::MenuUp => self.main_menu_statu.select_previous(),
+            Action::MenuSelect => {
+                if let Some(idx) = self.main_menu_statu.selected() {
+                    self.view = match idx {
+                        1 => View::AdjacencyMatrix,
+                        2 => View::AdjacencyList,
+                        3 => View::ShortestPath,
+
+                        _ => return,
+                    }
+                }
+            }
+
+            _ => {}
+        }
+    }
 }

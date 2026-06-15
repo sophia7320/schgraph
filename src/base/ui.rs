@@ -1,10 +1,11 @@
-use color_eyre::eyre::Result;
-use ratatui::Frame;
+mod main_menu;
 
 use crate::App;
+use ratatui::Frame;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub(super) enum View {
+    #[default]
     MainMenu,
     AdjacencyMatrix,
     AdjacencyList,
@@ -13,15 +14,9 @@ pub(super) enum View {
     Tsp,
 }
 
-impl Default for View {
-    fn default() -> Self {
-        View::MainMenu
-    }
-}
-
-pub fn render(app: &App, frame: &mut Frame) {
+pub fn render(app: &mut App, frame: &mut Frame) {
     match app.view {
-        View::MainMenu => todo!(),
-        _ => {}
+        View::MainMenu => main_menu::render(app, frame),
+        _ => todo!(),
     }
 }

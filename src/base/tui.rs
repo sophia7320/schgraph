@@ -37,13 +37,13 @@ impl Tui {
             panic_hook(panic);
         }));
 
-        self.terminal.hide_cursor();
-        self.terminal.clear();
+        self.terminal.hide_cursor()?;
+        self.terminal.clear()?;
 
         Ok(())
     }
 
-    pub fn draw(&mut self, app: &App) -> Result<()> {
+    pub fn draw(&mut self, app: &mut App) -> Result<()> {
         self.terminal.draw(|f| ui::render(app, f))?;
         Ok(())
     }
@@ -51,6 +51,12 @@ impl Tui {
     fn reset() -> Result<()> {
         terminal::disable_raw_mode()?;
         execute!(io::stderr(), LeaveAlternateScreen, DisableMouseCapture)?;
+        Ok(())
+    }
+
+    pub fn exit(&mut self) -> Result<()> {
+        Tui::reset()?;
+        self.terminal.show_cursor()?;
         Ok(())
     }
 }
