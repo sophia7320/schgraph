@@ -1,5 +1,6 @@
 #![allow(unused_variables)]
 #![allow(dead_code)]
+#![allow(clippy::expect_fun_call)]
 use std::{collections::HashMap, io};
 
 use color_eyre::eyre::Result;

@@ -11,7 +11,7 @@ use ratatui::{
 use crate::App;
 
 pub(super) fn render(app: &mut App, area: Rect, frame: &mut Frame) {
-    let title = Line::from("----------------AdjAmatriOfGraph--------------------".to_string())
+    let title = Line::from("----------------AdjMatriOfGraph--------------------".to_string())
         .style(Color::Green)
         .centered();
 

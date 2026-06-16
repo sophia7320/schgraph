@@ -113,7 +113,7 @@ impl<'a> ScannerIter<'a> {
             res.push(self.next_chunk_edge().unwrap());
         }
 
-        eprintln!("{:#?}", res);
+        // eprintln!("{:#?}", res);
 
         res
     }
