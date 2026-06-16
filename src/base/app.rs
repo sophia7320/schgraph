@@ -1,6 +1,5 @@
-#![allow(unused_variables)]
-#![allow(dead_code)]
 #![allow(clippy::expect_fun_call)]
+
 use std::{collections::HashMap, io};
 
 use color_eyre::eyre::Result;
@@ -123,10 +122,11 @@ impl App {
             Action::MenuSelect => {
                 if let Some(idx) = self.main_menu_statu.selected() {
                     self.view = match idx {
+                        0 => View::PlaceDesc,
                         1 => View::AdjacencyMatrix,
                         2 => View::AdjacencyList,
                         3 => View::ShortestPath,
-
+                        4 => View::Tsp,
                         _ => return,
                     }
                 }

@@ -1,6 +1,7 @@
+mod adj_list;
 mod adj_matri;
-mod graph_canvas;
 mod main_menu;
+mod place_desc;
 mod shortest_path;
 mod tsp;
 
@@ -16,9 +17,9 @@ use ratatui::{
 pub(super) enum View {
     #[default]
     MainMenu,
+    PlaceDesc,
     AdjacencyMatrix,
     AdjacencyList,
-    VisualGraph,
     ShortestPath,
     Tsp,
 }
@@ -41,9 +42,10 @@ pub fn render(app: &mut App, frame: &mut Frame) {
 
     match app.view {
         View::MainMenu => main_menu::render(app, area, frame),
+        View::PlaceDesc => place_desc::render(app, area, frame),
         View::AdjacencyMatrix => adj_matri::render(app, area, frame),
         View::ShortestPath => shortest_path::render(app, area, frame),
         View::Tsp => tsp::render(app, area, frame),
-        _ => todo!(),
+        View::AdjacencyList => adj_list::render(app, area, frame),
     }
 }

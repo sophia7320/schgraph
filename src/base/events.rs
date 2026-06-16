@@ -1,5 +1,3 @@
-#![allow(unused_variables)]
-#![allow(dead_code)]
 use std::{
     sync::mpsc::{self},
     thread,
@@ -7,14 +5,14 @@ use std::{
 };
 
 use color_eyre::eyre::Result;
-use crossterm::event::{self, Event as CrosstermEvent, KeyEvent, MouseEvent};
+use crossterm::event::{self, Event as CrosstermEvent, KeyEvent};
 
 #[derive(Clone, Copy, Debug)]
 pub(super) enum Event {
     Tick,
     Key(KeyEvent),
-    Mouse(MouseEvent),
-    Resize(u16, u16),
+    Mouse(()),
+    Resize((), ()),
 }
 
 #[derive(Debug)]
@@ -22,7 +20,6 @@ pub(super) struct EventHandler {
     #[allow(dead_code)]
     sender: mpsc::Sender<Event>,
     receiver: mpsc::Receiver<Event>,
-    handler: thread::JoinHandle<()>,
 }
 
 impl EventHandler {
@@ -30,7 +27,7 @@ impl EventHandler {
         let tick_rate = Duration::from_millis(tick_rate);
         let (sender, receiver) = mpsc::channel();
 
-        let handler = {
+        let _ = {
             let sender = sender.clone();
 
             thread::spawn(move || {
@@ -50,8 +47,8 @@ impl EventHandler {
                                     Ok(())
                                 }
                             }
-                            CrosstermEvent::Mouse(e) => sender.send(Event::Mouse(e)),
-                            CrosstermEvent::Resize(w, h) => sender.send(Event::Resize(w, h)),
+                            CrosstermEvent::Mouse(_) => sender.send(Event::Mouse(())),
+                            CrosstermEvent::Resize(_, _) => sender.send(Event::Resize((), ())),
                             _ => unimplemented!(),
                         }
                         .expect("failed to send terminal event")
@@ -65,11 +62,7 @@ impl EventHandler {
             })
         };
 
-        Self {
-            sender,
-            receiver,
-            handler,
-        }
+        Self { sender, receiver }
     }
 
     pub(super) fn next(&self) -> Result<Event> {

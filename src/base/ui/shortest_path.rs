@@ -77,7 +77,7 @@ fn render_answer(app: &mut App, area: Rect, frame: &mut Frame) {
         .collect::<Vec<_>>()
         .join(" -> ");
 
-    frame.render_widget(Paragraph::new(path_text), path_area);
+    frame.render_widget(Paragraph::new(path_text).style(Color::Red), path_area);
 
     let cost_text = match app.sp_cost {
         Some(cost) => cost.to_string(),
@@ -101,7 +101,7 @@ fn render_body(app: &mut App, area: Rect, frame: &mut Frame) {
     }
 }
 
-fn circle_positions(n: usize, r: f64) -> Vec<(f64, f64)> {
+pub(super) fn circle_positions(n: usize, r: f64) -> Vec<(f64, f64)> {
     (0..n)
         .map(|i| {
             let angle = 2.0 * PI * i as f64 / n as f64;
@@ -110,7 +110,7 @@ fn circle_positions(n: usize, r: f64) -> Vec<(f64, f64)> {
         .collect()
 }
 
-fn parse_to_list(path: &[usize]) -> Vec<(usize, usize)> {
+pub(super) fn parse_to_list(path: &[usize]) -> Vec<(usize, usize)> {
     let mut res = vec![];
     let n = path.len();
     if n == 0 {
@@ -171,16 +171,6 @@ fn render_canvas(app: &mut App, area: Rect, frame: &mut Frame) {
                     })
                 });
 
-            pos.iter().enumerate().for_each(|(id, &(x, y))| {
-                ctx.draw(&canvas::Circle {
-                    x,
-                    y,
-                    radius: 0.4,
-                    color: Color::LightYellow,
-                });
-                ctx.print(x, y, Line::from(format!("{}", id)).style(Color::Red));
-            });
-
             let hl_edges = parse_to_list(&app.sp_path);
 
             hl_edges.iter().for_each(|(src, dst)| {
@@ -191,6 +181,15 @@ fn render_canvas(app: &mut App, area: Rect, frame: &mut Frame) {
                     y2: pos[*dst].1,
                     color: Color::Green,
                 });
+            });
+            pos.iter().enumerate().for_each(|(id, &(x, y))| {
+                ctx.draw(&canvas::Circle {
+                    x,
+                    y,
+                    radius: 0.4,
+                    color: Color::LightYellow,
+                });
+                ctx.print(x, y, Line::from(format!("{}", id)).style(Color::Red));
             });
         });
 

@@ -1,5 +1,3 @@
-#![allow(unused_variables)]
-#![allow(dead_code)]
 use core::panic;
 use std::{fs, str::FromStr};
 
@@ -8,7 +6,6 @@ use crate::base::app::Place;
 #[derive(Debug)]
 pub struct FileScanner {
     content: Vec<String>,
-    pos: usize,
 }
 
 impl FileScanner {
@@ -18,7 +15,7 @@ impl FileScanner {
             .split_whitespace()
             .map(String::from)
             .collect();
-        Self { content, pos: 0 }
+        Self { content }
     }
 
     pub fn iter(&self) -> ScannerIter<'_> {
