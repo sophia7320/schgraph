@@ -19,6 +19,9 @@ pub struct App {
     should_exit: bool,
     pub(super) main_menu_statu: ListState,
 
+    pub(super) sp_input_left: String,
+    pub(super) sp_input_right: String,
+
     pub(super) view: View,
 
     pub(super) places: Vec<Place>,
