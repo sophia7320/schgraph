@@ -1,4 +1,5 @@
 mod adj_matri;
+mod graph_canvas;
 mod main_menu;
 mod shortest_path;
 mod tsp;
@@ -41,6 +42,7 @@ pub fn render(app: &mut App, frame: &mut Frame) {
     match app.view {
         View::MainMenu => main_menu::render(app, area, frame),
         View::AdjacencyMatrix => adj_matri::render(app, area, frame),
+        View::ShortestPath => shortest_path::render(app, area, frame),
         View::Tsp => tsp::render(app, area, frame),
         _ => todo!(),
     }

@@ -20,8 +20,12 @@ pub struct App {
     should_exit: bool,
     pub(super) main_menu_statu: ListState,
 
+    pub(super) sp_input_focus: SP_InputFocus,
     pub(super) sp_input_left: String,
     pub(super) sp_input_right: String,
+    pub(super) sp_select: usize,
+    pub(super) sp_path: Vec<usize>,
+    pub(super) sp_cost: Option<u64>,
 
     pub(super) view: View,
 
@@ -37,7 +41,9 @@ pub struct Place {
 }
 
 #[allow(nonstandard_style)]
+#[derive(Default, Debug)]
 pub(super) enum SP_InputFocus {
+    #[default]
     Left,
     Right,
 }
@@ -126,6 +132,37 @@ impl App {
                 }
             }
             Action::Back => self.view = View::MainMenu,
+
+            Action::SPInputToggleFocus => match self.sp_input_focus {
+                SP_InputFocus::Left => self.sp_input_focus = SP_InputFocus::Right,
+                SP_InputFocus::Right => self.sp_input_focus = SP_InputFocus::Left,
+            },
+
+            Action::InputChar(c) => match self.sp_input_focus {
+                SP_InputFocus::Left => self.sp_input_left.push(c),
+                SP_InputFocus::Right => self.sp_input_right.push(c),
+            },
+
+            Action::DeletChar => match self.sp_input_focus {
+                SP_InputFocus::Left => _ = self.sp_input_left.pop(),
+                SP_InputFocus::Right => _ = self.sp_input_right.pop(),
+            },
+
+            Action::IncreaseSelectTab => self.sp_select = (self.sp_select + 1) % 3,
+            Action::DecreaseSelectTab => self.sp_select = (self.sp_select + 2) % 3,
+
+            _ => {}
+        };
+
+        match action {
+            Action::InputChar(_) | Action::DeletChar => {
+                let (src, dst) = (
+                    self.sp_input_left.parse().unwrap_or(self.gra.cnt),
+                    self.sp_input_right.parse().unwrap_or(self.gra.cnt),
+                );
+
+                (self.sp_path, self.sp_cost) = self.gra.find_path(src, dst);
+            }
 
             _ => {}
         }

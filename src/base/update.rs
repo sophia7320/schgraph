@@ -13,6 +13,8 @@ pub(super) enum Action {
     SPInputToggleFocus,
     InputChar(char),
     DeletChar,
+    IncreaseSelectTab,
+    DecreaseSelectTab,
 
     Noop,
 }
@@ -24,6 +26,17 @@ pub(super) fn key_event_handle(key: KeyEvent, view: &View) -> Action {
             KeyCode::Char('j') | KeyCode::Down => Action::MenuDown,
             KeyCode::Char('k') | KeyCode::Up => Action::MenuUp,
             KeyCode::Enter | KeyCode::Tab => Action::MenuSelect,
+            _ => Action::Noop,
+        },
+
+        View::ShortestPath => match key.code {
+            KeyCode::Char(c) if c.is_ascii_digit() => Action::InputChar(c),
+            KeyCode::Backspace => Action::DeletChar,
+            KeyCode::Tab => Action::SPInputToggleFocus,
+            KeyCode::Char('h') => Action::DecreaseSelectTab,
+            KeyCode::Char('l') => Action::IncreaseSelectTab,
+            KeyCode::Char('q') | KeyCode::Esc => Action::Back,
+
             _ => Action::Noop,
         },
 

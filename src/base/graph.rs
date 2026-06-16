@@ -1,13 +1,10 @@
-#![allow(unused_variables)]
-#![allow(dead_code)]
-
 #[derive(Debug, Default)]
 pub struct Graph {
     pub(super) cnt: usize,
     pub(super) matri: Vec<Vec<u64>>,
     pub(super) linking: Vec<Vec<(usize, u64)>>,
     pre: Vec<Vec<usize>>,
-    shortest: Vec<Vec<u64>>,
+    pub(super) shortest: Vec<Vec<u64>>,
 
     tsp_path: Vec<usize>,
     tsp_cost: Option<u64>,
@@ -80,13 +77,13 @@ impl Graph {
         }
     }
 
-    pub fn find_path(&self, src: usize, dst: usize) -> Vec<usize> {
+    pub fn find_path(&self, src: usize, dst: usize) -> (Vec<usize>, Option<u64>) {
         let mut res = vec![];
 
         let mut p = dst;
 
-        if self.pre[src][dst] == self.cnt {
-            return res;
+        if src >= self.cnt || dst >= self.cnt || self.pre[src][dst] == self.cnt {
+            return (res, None);
         }
 
         loop {
@@ -99,7 +96,7 @@ impl Graph {
         }
 
         res.reverse();
-        res
+        (res, Some(self.shortest[src][dst]))
     }
 
     fn tsp(&mut self) {
@@ -151,7 +148,7 @@ impl Graph {
             self.tsp_cost = Some(best_cost);
             let mut path = Graph::find_tsp_path_to_last(tsp_prev, best_last);
             path = self.tsp_to_realpath(path);
-            path.extend(self.find_path(best_last, 0).drain(1..));
+            path.extend(self.find_path(best_last, 0).0.drain(1..));
             self.tsp_path = path;
         } else {
             self.tsp_cost = None;
@@ -180,13 +177,17 @@ impl Graph {
         let mut res = vec![];
         res.push(tsp_path[0]);
         for i in 0..(tsp_path.len() - 1) {
-            res.extend(self.find_path(tsp_path[i], tsp_path[i + 1]).drain(1..));
+            res.extend(self.find_path(tsp_path[i], tsp_path[i + 1]).0.drain(1..));
         }
         res
     }
 
     pub fn tsp_path(&self) -> &Vec<usize> {
         &self.tsp_path
+    }
+
+    pub fn tsp_cost(&self) -> Option<u64> {
+        self.tsp_cost
     }
 }
 
@@ -209,7 +210,7 @@ mod test {
         let es = vec![(0, 1, 5), (0, 3, 10), (1, 2, 3), (2, 3, 1), (1, 3, 6)];
         let gra = Graph::new(4, es);
 
-        assert_eq!(gra.find_path(0, 3), vec![0, 1, 2, 3]);
+        assert_eq!(gra.find_path(0, 3).0, vec![0, 1, 2, 3]);
     }
 
     #[test]
