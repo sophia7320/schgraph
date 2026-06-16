@@ -27,9 +27,9 @@ pub struct App {
 
 #[derive(Debug)]
 pub struct Place {
-    id: usize,
-    name: String,
-    desc: String,
+    pub(super) id: usize,
+    pub(super) name: String,
+    pub(super) desc: String,
 }
 
 impl Place {
@@ -48,19 +48,30 @@ impl App {
         app.view = View::MainMenu;
 
         let scanner = FileScanner::from_file_path(filepath);
+        eprintln!("{:?}", scanner);
         let mut input = scanner.iter();
 
         app.places = input.get_places();
         let mut mapper = HashMap::with_capacity(app.places.len());
 
+        eprintln!("{:#?}", app.places);
+
         app.places.iter().enumerate().for_each(|(id, place)| {
             mapper.insert(&place.name, id);
         });
 
+        eprintln!("{:#?}", mapper);
+
         let edges: Vec<(usize, usize, u64)> = input
             .get_raw_edges()
             .iter()
-            .map(|(u, v, w)| (*mapper.get(u).unwrap(), *mapper.get(v).unwrap(), *w))
+            .map(|(u, v, w)| {
+                (
+                    *mapper.get(u).expect(format!("{} is valid\n", u).as_str()),
+                    *mapper.get(v).expect(format!("{} is valid\n", v).as_str()),
+                    *w,
+                )
+            })
             .collect();
 
         app.gra = Graph::new(app.places.len(), edges);
@@ -110,8 +121,20 @@ impl App {
                     }
                 }
             }
+            Action::Back => self.view = View::MainMenu,
 
             _ => {}
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::App;
+
+    #[test]
+    fn from_file() {
+        let app = App::from_file("input.txt").unwrap();
+        eprintln!("{:?}", app.gra.matri);
     }
 }

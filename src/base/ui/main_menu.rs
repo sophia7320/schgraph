@@ -1,16 +1,15 @@
 use ratatui::{
     Frame,
     layout::{Constraint, Layout, Rect},
-    style::{Color, Modifier, Stylize},
-    text::{Line, Span},
+    style::{Color, Modifier},
+    text::Line,
     widgets::List,
 };
 
 use crate::App;
 
-pub(super) fn render(app: &mut App, frame: &mut Frame) {
+pub(super) fn render(app: &mut App, area: Rect, frame: &mut Frame) {
     let constraints = [
-        Constraint::Length(1),
         Constraint::Length(1),
         Constraint::Percentage(10),
         Constraint::Fill(1),
@@ -19,13 +18,10 @@ pub(super) fn render(app: &mut App, frame: &mut Frame) {
 
     let layout = Layout::vertical(constraints).spacing(1);
 
-    let [top, top_desc, _, body, bottom] = frame.area().layout(&layout);
-
-    let title = Line::from_iter([Span::from("-- SchoolGraph -- ").bold()]).centered();
+    let [top_desc, _, body, bottom] = area.layout(&layout);
 
     let desc = Line::from("(Press 'q' to quit and arrow keys to navigate)").centered();
 
-    frame.render_widget(title, top);
     frame.render_widget(desc, top_desc);
 
     render_options(app, body, frame);
@@ -55,7 +51,7 @@ fn render_options(app: &mut App, area: Rect, frame: &mut Frame) {
         Constraint::Fill(1),
     ]);
 
-    let [_, area, _] = area.layout(&layout);
+    // let [_, area, _] = area.layout(&layout);
 
     frame.render_stateful_widget(list, area, list_state);
 }

@@ -27,6 +27,10 @@ pub(super) fn key_event_handle(key: KeyEvent, view: &View) -> Action {
             _ => Action::Noop,
         },
 
-        _ => Action::Noop,
+        _ => match key.code {
+            KeyCode::Char('q') | KeyCode::Esc => Action::Back,
+
+            _ => Action::Noop,
+        },
     }
 }

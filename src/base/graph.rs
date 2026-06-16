@@ -3,9 +3,9 @@
 
 #[derive(Debug, Default)]
 pub struct Graph {
-    cnt: usize,
-    matri: Vec<Vec<u64>>,
-    linking: Vec<Vec<(usize, u64)>>,
+    pub(super) cnt: usize,
+    pub(super) matri: Vec<Vec<u64>>,
+    pub(super) linking: Vec<Vec<(usize, u64)>>,
     pre: Vec<Vec<usize>>,
     shortest: Vec<Vec<u64>>,
 
