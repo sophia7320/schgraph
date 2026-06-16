@@ -45,12 +45,6 @@ fn render_options(app: &mut App, area: Rect, frame: &mut Frame) {
 
     let list_state = &mut app.main_menu_statu;
 
-    let layout = Layout::horizontal([
-        Constraint::Fill(1),
-        Constraint::Length(85),
-        Constraint::Fill(1),
-    ]);
-
     // let [_, area, _] = area.layout(&layout);
 
     frame.render_stateful_widget(list, area, list_state);

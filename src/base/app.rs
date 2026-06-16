@@ -32,6 +32,12 @@ pub struct Place {
     pub(super) desc: String,
 }
 
+#[allow(nonstandard_style)]
+pub(super) enum SP_InputFocus {
+    Left,
+    Right,
+}
+
 impl Place {
     pub fn new(id: usize, name: String, desc: String) -> Place {
         Place { id, name, desc }
@@ -45,7 +51,6 @@ impl App {
 
     pub fn from_file(filepath: &str) -> Result<Self> {
         let mut app = App::new();
-        app.view = View::MainMenu;
 
         let scanner = FileScanner::from_file_path(filepath);
         let mut input = scanner.iter();

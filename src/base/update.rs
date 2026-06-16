@@ -1,6 +1,6 @@
-use crossterm::event::{self, KeyCode, KeyEvent};
+use crossterm::event::{KeyCode, KeyEvent};
 
-use crate::base::{events::Event, ui::View};
+use crate::base::ui::View;
 
 pub(super) enum Action {
     Quit,

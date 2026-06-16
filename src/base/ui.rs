@@ -1,5 +1,7 @@
 mod adj_matri;
 mod main_menu;
+mod shortest_path;
+mod tsp;
 
 use crate::App;
 use ratatui::{
@@ -39,6 +41,7 @@ pub fn render(app: &mut App, frame: &mut Frame) {
     match app.view {
         View::MainMenu => main_menu::render(app, area, frame),
         View::AdjacencyMatrix => adj_matri::render(app, area, frame),
+        View::Tsp => tsp::render(app, area, frame),
         _ => todo!(),
     }
 }

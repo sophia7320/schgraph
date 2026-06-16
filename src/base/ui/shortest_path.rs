@@ -1,0 +1,45 @@
+use ratatui::{
+    Frame,
+    layout::{Constraint, Layout, Rect},
+};
+
+use crate::App;
+
+pub fn render(app: &mut App, area: Rect, frame: &mut Frame) {
+    let layout = Layout::vertical([
+        Constraint::Length(1),
+        Constraint::Length(2),
+        Constraint::Fill(1),
+    ])
+    .spacing(1);
+
+    let [input_line, path_answer, body] = area.layout(&layout);
+
+    render_input_line(app, input_line, frame);
+    render_path_answer(app, path_answer, frame);
+    render_body(app, body, frame);
+}
+
+fn render_input_line(app: &mut App, area: Rect, frame: &mut Frame) {
+    todo!()
+}
+
+fn render_path_answer(app: &mut App, area: Rect, frame: &mut Frame) {
+    todo!()
+}
+
+fn render_body(app: &mut App, area: Rect, frame: &mut Frame) {
+    todo!()
+}
+
+fn render_idex_map(app: &mut App, area: Rect, frame: &mut Frame) {
+    todo!()
+}
+
+fn render_canvas(app: &mut App, area: Rect, frame: &mut Frame) {
+    todo!()
+}
+
+fn render_place_details(app: &mut App, area: Rect, frame: &mut Frame) {
+    todo!()
+}
