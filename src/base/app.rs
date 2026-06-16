@@ -48,19 +48,14 @@ impl App {
         app.view = View::MainMenu;
 
         let scanner = FileScanner::from_file_path(filepath);
-        eprintln!("{:?}", scanner);
         let mut input = scanner.iter();
 
         app.places = input.get_places();
         let mut mapper = HashMap::with_capacity(app.places.len());
 
-        eprintln!("{:#?}", app.places);
-
         app.places.iter().enumerate().for_each(|(id, place)| {
             mapper.insert(&place.name, id);
         });
-
-        eprintln!("{:#?}", mapper);
 
         let edges: Vec<(usize, usize, u64)> = input
             .get_raw_edges()

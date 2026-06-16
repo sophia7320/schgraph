@@ -5,7 +5,7 @@ use ratatui::{
     layout::{Constraint, Layout, Rect},
     style::Color,
     text::Line,
-    widgets::{Row, Table, TableState},
+    widgets::{Row, Table},
 };
 
 use crate::App;
@@ -15,7 +15,7 @@ pub(super) fn render(app: &mut App, area: Rect, frame: &mut Frame) {
         .style(Color::Green)
         .centered();
 
-    let layout = Layout::vertical([Constraint::Length(1), Constraint::Fill(1)]);
+    let layout = Layout::vertical([Constraint::Length(1), Constraint::Fill(1)]).spacing(1);
 
     let [top, body] = area.layout(&layout);
 
@@ -31,14 +31,19 @@ fn render_matri(app: &mut App, area: Rect, frame: &mut Frame) {
         once(String::default()).chain((0..n).map(|x| x.to_string())),
     ))
     .chain((0..n).map(|row| {
-        Row::new(once(row.to_string()).chain((0..n).map(|col| graph.matri[row][col].to_string())))
+        Row::new(once(row.to_string()).chain((0..n).map(|col| {
+            let dis = &app.gra.matri[row][col];
+            if *dis != u64::MAX / 2 {
+                dis.to_string()
+            } else {
+                "∞".to_string()
+            }
+        })))
     }));
 
-    let widths = (0..=n).map(|_| Constraint::Length(3));
+    let widths = (0..=n).map(|_| Constraint::Length(4));
 
     let mat_table = Table::new(mat, widths).style(Color::Blue).column_spacing(1);
-
-    let mat_state = &mut TableState::default();
 
     frame.render_widget(mat_table, area);
     // frame.render_stateful_widget(mat_table, area, mat_state);
