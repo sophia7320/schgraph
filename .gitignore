@@ -1,4 +1,3 @@
-/target
-AGENTS.md
-release
+target/
+release/
 doc
