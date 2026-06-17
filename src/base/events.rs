@@ -49,7 +49,7 @@ impl EventHandler {
                             }
                             CrosstermEvent::Mouse(_) => sender.send(Event::Mouse(())),
                             CrosstermEvent::Resize(_, _) => sender.send(Event::Resize((), ())),
-                            _ => unimplemented!(),
+                            _ => Ok(()),
                         }
                         .expect("failed to send terminal event")
                     }
