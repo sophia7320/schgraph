@@ -1,4 +1,4 @@
-use std::f64::consts::PI;
+use std::{f64::consts::PI, iter::once};
 
 use ratatui::{
     Frame,
@@ -71,12 +71,27 @@ fn render_answer(app: &mut App, area: Rect, frame: &mut Frame) {
 
     let [path_area, cost_area] = area.layout(&layout);
 
-    let path_text = app
-        .sp_path
-        .iter()
-        .map(|x| x.to_string())
-        .collect::<Vec<_>>()
-        .join(" -> ");
+    // let path_text = app
+    //     .sp_path
+    //     .iter()
+    //     .map(|x| x.to_string())
+    //     .collect::<Vec<_>>()
+    //     .join(" -> ");
+    //
+    let path_text = once(if let Some(src) = app.sp_path.first() {
+        src.to_string()
+    } else {
+        "".to_string()
+    })
+    .chain((1..app.sp_path.len()).map(|id| {
+        format!(
+            " -({})-> {}",
+            app.gra.shortest[app.sp_path[id - 1]][app.sp_path[id]],
+            app.sp_path[id]
+        )
+    }))
+    .collect::<Vec<String>>()
+    .join("");
 
     frame.render_widget(Paragraph::new(path_text).style(Color::Red), path_area);
 
