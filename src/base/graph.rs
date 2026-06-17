@@ -108,8 +108,6 @@ impl Graph {
             }
             visited[src] = true;
 
-            eprintln!("{:?}", pq);
-
             links[src].iter().for_each(|(dst, w)| {
                 let new_dis = cur_dis + w;
                 if !visited[*dst] {
