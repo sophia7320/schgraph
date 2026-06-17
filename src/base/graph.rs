@@ -1,3 +1,4 @@
+use std::{collections::BinaryHeap, env, vec};
 #[derive(Debug, Default)]
 pub struct Graph {
     pub(super) cnt: usize,
@@ -8,6 +9,24 @@ pub struct Graph {
 
     tsp_path: Vec<usize>,
     tsp_cost: Option<u64>,
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+struct Node {
+    id: usize,
+    dis: u64,
+}
+
+impl Ord for Node {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        other.dis.cmp(&self.dis)
+    }
+}
+
+impl PartialOrd for Node {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 impl Graph {
@@ -29,9 +48,15 @@ impl Graph {
             tsp_cost,
         };
 
+        let is_dj = env::var("DJ").unwrap_or("FALSE".to_string());
+
         res.build(v);
 
-        res.floyd();
+        if is_dj.as_str() == "TRUE" {
+            res.dijkstra();
+        } else {
+            res.floyd();
+        }
 
         res.tsp();
 
@@ -58,6 +83,61 @@ impl Graph {
             self.pre[u][v] = u;
             self.pre[v][u] = v;
         }
+    }
+
+    fn dijkstra(&mut self) {
+        (0..self.cnt).for_each(|i| self.djs(i));
+    }
+
+    fn djs(&mut self, id: usize) {
+        let mut res = vec![None; self.cnt];
+        let mut visited = vec![false; self.cnt];
+        let mut pq = BinaryHeap::new();
+        let links = &self.linking;
+
+        pq.push(Node { id, dis: 0 });
+        res[id] = Some(0_u64);
+
+        while let Some(Node {
+            id: src,
+            dis: cur_dis,
+        }) = pq.pop()
+        {
+            if visited[src] || matches!(res[src] , Some(dis) if cur_dis > dis) {
+                continue;
+            }
+            visited[src] = true;
+
+            eprintln!("{:?}", pq);
+
+            links[src].iter().for_each(|(dst, w)| {
+                let new_dis = cur_dis + w;
+                if !visited[*dst] {
+                    if let Some(old_dis) = res[*dst] {
+                        if old_dis > new_dis {
+                            pq.push(Node {
+                                id: *dst,
+                                dis: new_dis,
+                            });
+                            res[*dst] = Some(new_dis);
+                            self.pre[id][*dst] = src;
+                        }
+                    } else {
+                        pq.push(Node {
+                            id: *dst,
+                            dis: new_dis,
+                        });
+                        res[*dst] = Some(new_dis);
+                        self.pre[id][*dst] = src;
+                    }
+                }
+            });
+        }
+
+        res.iter().enumerate().for_each(|(dst, w)| {
+            let w = w.unwrap_or(u64::MAX / 2);
+            self.shortest[id][dst] = w;
+        });
     }
 
     fn floyd(&mut self) {

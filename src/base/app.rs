@@ -175,7 +175,7 @@ mod test {
 
     #[test]
     fn from_file() {
-        let app = App::from_file("input.txt").unwrap();
-        eprintln!("{:?}", app.gra.matri);
+        let _ = App::from_file("input.txt").unwrap();
+        // eprintln!("{:?}", app.gra.matri);
     }
 }
