@@ -2,11 +2,12 @@ use std::f64::consts::PI;
 
 use ratatui::{
     Frame,
-    layout::{Alignment, Constraint, Layout, Rect},
-    style::{Color, Stylize},
+    layout::{Alignment, Constraint, Layout, Offset, Rect},
+    style::{Color, Style, Stylize},
+    symbols,
     text::Line,
     widgets::{
-        Block, List, Paragraph,
+        Block, List, Paragraph, Tabs,
         canvas::{self, Canvas},
     },
 };
@@ -92,13 +93,25 @@ fn render_answer(app: &mut App, area: Rect, frame: &mut Frame) {
 }
 
 fn render_body(app: &mut App, area: Rect, frame: &mut Frame) {
+    render_tags(app, area + Offset::new(1, -1), frame);
+
     match app.sp_select {
         0 => render_idex_map(app, area, frame),
         1 => render_canvas(app, area, frame),
         2 => render_place_details(app, area, frame),
-
         _ => {}
     }
+}
+
+fn render_tags(app: &mut App, area: Rect, frame: &mut Frame) {
+    let tabs = Tabs::new(["id_mapping", "visalgraph", "place_desc"])
+        .style(Color::White)
+        .highlight_style(Style::default().red().on_black().bold())
+        .select(app.sp_select)
+        .divider(symbols::DOT)
+        .padding(" ", " ");
+
+    frame.render_widget(tabs, area);
 }
 
 pub(super) fn circle_positions(n: usize, r: f64) -> Vec<(f64, f64)> {
